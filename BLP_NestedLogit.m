@@ -22,7 +22,8 @@ X(:,1:4)=data(:,3:6);
 % 6: Price
 % 7: Market share
 
-%We proceed just like in the logits case. First, we calculate the outside good market share
+% Now the demand allows a nested logit using the outside good as the nest.
+% We start just like in the logit case. First, we calculate the outside good market share
 
 outside_share=zeros(70,1);
 for m=1:markets
