@@ -68,9 +68,8 @@ for m=1:markets
     
 end
 
-%Third, I get rid of the unobserved tsi_j by calculating the average delta
-%for each product across markets, and substrating that average from the
-%previous deltas; like a fixed-effect estimator when using panel data
+%Third, I calculate the mean utility for each product across markets, and substract that average from the
+%mean utility; like a fixed-effect estimator when using panel data
 
 delta_avg=zeros(products,1);
 X_avg=zeros(products,4);
@@ -112,7 +111,7 @@ for p=1:products
 end
 
 %Lastly, we note that the first three covariates (PPO, network, and satisfaction)
-%don't change accross observartionsm, so they are unidentifiable with this
+%don't change accross observartions, so they are unidentifiable with this
 %method. Thus, I regress delta_bar on the demeaned price x
 
 y=delta_bar(:,3);
@@ -188,7 +187,7 @@ end
 
 end
 
-%%%%%%%%%%%%%%%%% MARK-UPS
+%%%%%%%%%%%%%%%%% I now recover firms' mark-ups for each market-product using the demand elasticty formula and lerner index
 
 d_shares=zeros(markets,products);
 markups=zeros(markets,products);
@@ -205,7 +204,7 @@ for m=1:markets
 end
 
 
-%%%%%%%%%%%%%%%%% Marginal Costs
+%%%%%%%%%%%%%%%%% Now estimate the marginal cost of each product
 
 mc=prices-markups;
 
@@ -216,7 +215,7 @@ for m=1:markets
     for i=1:obs
         
         if (data(i,1)==m)&(data(i,2)==p)
-            marginalcost(i)=mc(m,p);    
+            marginalcost(i)=mc(m,p);    %marginal cost for market-product
         end    
     end
     end
@@ -236,7 +235,7 @@ sum2=sum2+transpose(x(i,:))*y(i);
 
 end
 
-beta=inv(sum1)*sum2;
+beta=inv(sum1)*sum2;    %linear regression of mc on product variates and an intercept
 e=y-x*beta;
 error_sq=dot(e,e);
 var=error_sq/(obs-2);
@@ -246,9 +245,9 @@ SE_beta2=sqrt(V(2,2));
 SE_beta3=sqrt(V(3,3));
 SE_beta4=sqrt(V(4,4));
 
-%%%%%%%%%%%%%%%%% SUBSIDY
+%%%%%%%%%%%%%%%%% Simulate the effect of subsidizing the price and compute new Bertrand-NE
 
-%First, I calculate the tsi plus x*b
+%First, I calculate the mean utility without the price: tsi plus x*b
 
 
 residuals=zeros(markets,products);
@@ -268,7 +267,8 @@ global m2;
 solution=zeros(obs,1);
 
 for m=1:70
-    
+% Compute NE for each market. 
+    %This can can be optimized to the price market by market rather than the full vector  
 m1=m;    
 m2=m;
 subsidy=250;
